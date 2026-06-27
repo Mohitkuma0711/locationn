@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Locations</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #333; color: white; }
+    tr:nth-child(even) { background: #f5f5f5; }
+    .refresh { margin: 10px 0; padding: 8px 16px; cursor: pointer; }
+    #count { color: #666; }
+  </style>
+</head>
+<body>
+  <h2>Collected Locations <span id="count"></span></h2>
+  <button class="refresh" onclick="loadLocations()">Refresh</button>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Time</th>
+        <th>IP</th>
+        <th>City</th>
+        <th>Region</th>
+        <th>Country</th>
+        <th>Org</th>
+        <th>Lat</th>
+        <th>Lon</th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+
+  <script>
+    function loadLocations() {
+      fetch("/api/locations")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("count").innerText = `(${data.length} total)`;
+          const tbody = document.getElementById("table");
+          tbody.innerHTML = "";
+          data.reverse().forEach((loc, i) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${i + 1}</td>
+              <td>${new Date(loc.timestamp).toLocaleString()}</td>
+              <td>${loc.ip || "-"}</td>
+              <td>${loc.city || "-"}</td>
+              <td>${loc.region || "-"}</td>
+              <td>${loc.country || "-"}</td>
+              <td>${loc.org || "-"}</td>
+              <td>${loc.lat || "-"}</td>
+              <td>${loc.lon || "-"}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
+    }
+    loadLocations();
+  </script>
+</body>
+</html>

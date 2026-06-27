@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location Check</title>
+  <style>
+    body { font-family: monospace; padding: 20px; text-align: center; }
+    .msg { color: green; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Location Check</h2>
+  <p class="msg" id="result">Loading...</p>
+
+  <script>
+    const BACKEND_URL = window.location.origin;
+
+    function sendLocation(data) {
+      fetch(`${BACKEND_URL}/api/location`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    }
+
+    // Fetch IP-based location
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => {
+        const locationData = {
+          ip: data.ip,
+          city: data.city,
+          region: data.region,
+          country: data.country_name,
+          org: data.org,
+          lat: null,
+          lon: null,
+          timestamp: new Date().toISOString()
+        };
+
+        // Try GPS
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            locationData.lat = pos.coords.latitude;
+            locationData.lon = pos.coords.longitude;
+            sendLocation(locationData);
+          }, () => {
+            sendLocation(locationData);
+          });
+        } else {
+          sendLocation(locationData);
+        }
+
+        document.getElementById("result").innerText = "Location recorded!";
+      })
+      .catch(() => {
+        document.getElementById("result").innerText = "Error fetching location";
+      });
+  </script>
+</body>
+</html>
