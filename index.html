@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location Check</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    #result { background: #f0f0f0; padding: 10px; border-radius: 5px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Location Check</h2>
+  <p id="result">Loading...</p>
+
+  <script>
+    let results = "";
+
+    // Auto fetch IP-based location (HTTPS compatible)
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => {
+        results += `IP: ${data.ip}\nCity: ${data.city}\nRegion: ${data.region}\nCountry: ${data.country_name}\nOrg: ${data.org}`;
+        document.getElementById("result").innerText = results;
+      })
+      .catch(() => {
+        results += "IP lookup failed\n";
+        document.getElementById("result").innerText = results;
+      });
+
+    // Auto attempt GPS location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        results += `\nLat: ${lat}\nLon: ${lon}`;
+        document.getElementById("result").innerText = results;
+      }, () => {
+        results += "\nGPS: Permission denied";
+        document.getElementById("result").innerText = results;
+      });
+    }
+  </script>
+</body>
+</html>
