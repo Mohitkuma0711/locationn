@@ -17,10 +17,14 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-      }).then(() => {
-        document.getElementById("result").innerText = "Location recorded!";
-      }).catch(() => {
-        document.getElementById("result").innerText = "Error sending location";
+      }).then(res => res.json()).then(res => {
+        if (res.success) {
+          document.getElementById("result").innerText = "Location recorded!";
+        } else {
+          document.getElementById("result").innerText = "Error: " + (res.error || "Unknown");
+        }
+      }).catch(err => {
+        document.getElementById("result").innerText = "Error: " + err.message;
       });
     }
 
