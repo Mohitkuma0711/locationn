@@ -12,17 +12,18 @@
   <p class="msg" id="result">Loading...</p>
 
   <script>
-    const BACKEND_URL = window.location.origin;
-
     function sendLocation(data) {
-      fetch(`${BACKEND_URL}/api/location`, {
+      fetch("/api/location", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
+      }).then(() => {
+        document.getElementById("result").innerText = "Location recorded!";
+      }).catch(() => {
+        document.getElementById("result").innerText = "Error sending location";
       });
     }
 
-    // Fetch IP-based location
     fetch("https://ipapi.co/json/")
       .then(res => res.json())
       .then(data => {
@@ -37,7 +38,6 @@
           timestamp: new Date().toISOString()
         };
 
-        // Try GPS
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition((pos) => {
             locationData.lat = pos.coords.latitude;
@@ -49,8 +49,6 @@
         } else {
           sendLocation(locationData);
         }
-
-        document.getElementById("result").innerText = "Location recorded!";
       })
       .catch(() => {
         document.getElementById("result").innerText = "Error fetching location";
